@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, IconButton, Box, Menu, MenuItem, ListItemIcon } from '@mui/material';
+import { Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, IconButton, Menu, MenuItem, Box } from '@mui/material';
 import AdminHeader from '../components/AdminHeader';
 import Footer from '../components/Footer';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { PersonAdd, PersonRemove } from '@mui/icons-material'; // You can use icons for role change actions
 
 const sampleUsers = [
     { id: 1, name: 'John Doe', email: 'johndoe@example.com', role: 'Admin' },
@@ -21,32 +20,77 @@ const sampleUsers = [
 
 function ManageUsers() {
     const [users, setUsers] = useState(sampleUsers);
-    const [filteredUsers, setFilteredUsers] = useState(sampleUsers);
-    const [anchorEl, setAnchorEl] = useState(null); // State for Menu anchor
-    const [selectedUser, setSelectedUser] = useState(null); // State for the selected user
+    const [selectedFilter, setSelectedFilter] = useState('All');
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null);
 
     const handleDelete = (userId) => {
         setUsers(users.filter(user => user.id !== userId));
     };
 
-    const handleMenuOpen = (event, user) => {
-        setAnchorEl(event.currentTarget);
-        setSelectedUser(user);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-        setSelectedUser(null);
+    const handleFilterChange = (filter) => {
+        setSelectedFilter(filter);
     };
 
     const handleRoleChange = (newRole) => {
         if (selectedUser) {
-            const updatedUsers = users.map(user =>
-                user.id === selectedUser.id ? { ...user, role: newRole } : user
-            );
-            setUsers(updatedUsers);
+            setUsers(users.map(user => user.id === selectedUser.id ? { ...user, role: newRole } : user));
         }
-        handleMenuClose(); // Close the menu after role change
+        setAnchorEl(null);
+    };
+
+    const handleRoleMenuOpen = (event, user) => {
+        setSelectedUser(user);
+        setAnchorEl(event.currentTarget);
+    };
+
+    const renderTable = (role) => {
+        const filteredUsers = users.filter(user => user.role === role);
+
+        return (
+            <TableContainer component={Paper} style={{ marginBottom: '20px' }}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Email</TableCell>
+                            <TableCell>Role</TableCell>
+                            <TableCell>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {filteredUsers.map((user) => (
+                            <TableRow key={user.id}>
+                                <TableCell>{user.name}</TableCell>
+                                <TableCell>{user.email}</TableCell>
+                                <TableCell>{user.role}</TableCell>
+                                <TableCell>
+                                    {/* MoreVert Icon for changing roles (Admin/Committee only) */}
+                                    {(user.role === 'Admin' || user.role === 'Committee') && (
+                                        <IconButton
+                                            onClick={(event) => handleRoleMenuOpen(event, user)}
+                                            color="primary"
+                                            aria-controls="role-menu"
+                                            aria-haspopup="true"
+                                        >
+                                            <MoreVertIcon />
+                                        </IconButton>
+                                    )}
+
+                                    {/* Delete Button */}
+                                    <IconButton
+                                        onClick={() => handleDelete(user.id)}
+                                        color="secondary"
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        );
     };
 
     return (
@@ -56,92 +100,50 @@ function ManageUsers() {
                 <Typography variant="h4" gutterBottom>
                     Manage Users
                 </Typography>
-
+                
                 {/* Filters */}
                 <div style={{ marginBottom: '20px' }}>
-                    <Button onClick={() => setFilteredUsers(users)} variant="contained" color="success" style={{ marginRight: '10px' }}>
+                    <Button onClick={() => handleFilterChange('All')} variant="contained" color="secondary" style={{ marginRight: '10px' }}>
                         View All
                     </Button>
-                    <Button onClick={() => setFilteredUsers(users.filter(user => user.role === 'Student'))} variant="contained" color="primary" style={{ marginRight: '10px' }}>
+                    <Button onClick={() => handleFilterChange('Student')} variant="contained" color="primary" style={{ marginRight: '10px' }}>
                         View Students
                     </Button>
-                    <Button onClick={() => setFilteredUsers(users.filter(user => user.role === 'Committee'))} variant="contained" color="primary" style={{ marginRight: '10px' }}>
+                    <Button onClick={() => handleFilterChange('Committee')} variant="contained" color="primary" style={{ marginRight: '10px' }}>
                         View Committees
                     </Button>
-                    <Button onClick={() => setFilteredUsers(users.filter(user => user.role === 'Admin'))} variant="contained" color="primary">
+                    <Button onClick={() => handleFilterChange('Admin')} variant="contained" color="primary">
                         View Admins
                     </Button>
                 </div>
 
-                {/* Admin Table */}
-                {filteredUsers.some(user => user.role === 'Admin') && (
-                    <TableContainer component={Paper} style={{ marginBottom: '20px' }}>
-                        <Typography variant="h6" gutterBottom>Admin Users</Typography>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Name</TableCell>
-                                    <TableCell>Email</TableCell>
-                                    <TableCell>Role</TableCell>
-                                    <TableCell>Actions</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {filteredUsers.filter(user => user.role === 'Admin').map((user) => (
-                                    <TableRow key={user.id}>
-                                        <TableCell>{user.name}</TableCell>
-                                        <TableCell>{user.email}</TableCell>
-                                        <TableCell>{user.role}</TableCell>
-                                        <TableCell>
-                                            <IconButton
-                                                onClick={(event) => handleMenuOpen(event, user)}
-                                                color="primary"
-                                            >
-                                                <MoreVertIcon />
-                                            </IconButton>
-                                            <IconButton
-                                                onClick={() => handleDelete(user.id)}
-                                                color="secondary"
-                                            >
-                                                <DeleteIcon />
-                                            </IconButton>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                {/* Conditionally Render Tables based on selected filter */}
+                {selectedFilter === 'All' && (
+                    <>
+                        {renderTable('Admin')}
+                        {renderTable('Committee')}
+                        {renderTable('Student')}
+                    </>
                 )}
-
-                {/* Menu for changing roles */}
-                <Menu
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                >
-                    <MenuItem onClick={() => handleRoleChange('Admin')}>
-                        <ListItemIcon>
-                            <PersonAdd fontSize="small" />
-                        </ListItemIcon>
-                        Change role to Admin
-                    </MenuItem>
-                    <MenuItem onClick={() => handleRoleChange('Committee')}>
-                        <ListItemIcon>
-                            <PersonAdd fontSize="small" />
-                        </ListItemIcon>
-                        Change role to Committee
-                    </MenuItem>
-                    <MenuItem onClick={() => handleRoleChange('Student')}>
-                        <ListItemIcon>
-                            <PersonRemove fontSize="small" />
-                        </ListItemIcon>
-                        Change role to Student
-                    </MenuItem>
-                </Menu>
+                {selectedFilter === 'Student' && renderTable('Student')}
+                {selectedFilter === 'Committee' && renderTable('Committee')}
+                {selectedFilter === 'Admin' && renderTable('Admin')}
             </div>
+
             <Box style={{ marginTop: '20px' }}>
                 <Footer />
             </Box>
+
+            {/* Role Change Menu */}
+            <Menu
+                id="role-menu"
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={() => setAnchorEl(null)}
+            >
+                <MenuItem onClick={() => handleRoleChange('Committee')}>Change to Committee</MenuItem>
+                <MenuItem onClick={() => handleRoleChange('Admin')}>Change to Admin</MenuItem>
+            </Menu>
         </div>
     );
 }

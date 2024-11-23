@@ -48,7 +48,7 @@ function AdminHeader() {
 
                         {/* View All Applications */}
                         <Box display="flex" alignItems="center" sx={{ borderLeft: '1px solid gray', paddingLeft: 2 }}>
-                            <IconButton color="inherit" component={Link} to="/admin/view-all-applications">
+                            <IconButton color="inherit" component={Link} to="/admin/view-applications">
                                 <Box display="flex" alignItems="center">
                                     <AssignmentIcon />
                                     <Typography variant="body2" sx={{ marginLeft: 1 }}>View Applications</Typography>
