@@ -17,14 +17,14 @@ function AdminDashboard() {
             title: 'Set Application Dates',
             description: 'Set start and end dates for the application and voting process.',
             buttonText: 'Manage Dates',
-            link: '/admin/manage-application',
+            link: '/admin/manage-dates',
             color: 'secondary',
         },
         {
             title: 'View All Applications',
             description: 'Review all applications and their current status.',
             buttonText: 'Go to Applications',
-            link: '/admin/view-all-applications',
+            link: '/admin/view-applications',
             color: 'warning',
         },
     ];

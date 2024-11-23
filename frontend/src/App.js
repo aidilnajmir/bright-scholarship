@@ -11,7 +11,8 @@ import ReimbursementPage from './pages/ReimbursementPage';
 import SendResults from './pages/SendResultEmails';
 import ViewApplications from './pages/ViewApplications';
 import ManageUsers from './pages/ManageUsers';
-import ManageApplication from './pages/ManageApplication';
+import ManageApplication from './pages/ManageDates';
+import ViewAllApplications from './pages/ViewApplicationsAdmin';
 
 function App() {
     return (
@@ -36,8 +37,8 @@ function App() {
                 {/* Admin Pages */}
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/manage-users" element={<ManageUsers />} />
-                <Route path="/admin/manage-application" element={<ManageApplication />} />
-                <Route path="/admin/view-applications" element={<ViewApplications />} />
+                <Route path="/admin/manage-dates" element={<ManageApplication />} />
+                <Route path="/admin/view-applications" element={<ViewAllApplications />} />
             </Routes>
         </Router>
     );
